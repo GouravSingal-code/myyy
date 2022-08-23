@@ -8,14 +8,14 @@ var xss = require("xss")
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const helmet = require('helmet');
-const router = express.Router();
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+const router = require('./routes/users');
 
 var server = http.createServer(app)
 var io = require('socket.io')(server)
 
-app.use(cors())
+app.use(cors());
 app.use(bodyParser.json())
 
 // Constants
@@ -35,7 +35,7 @@ const {
 
   // Connecting to Database
   mongoose
-	.connect("mongodb://127.0.0.1:27017/cashadvance-test", {
+	.connect("mongodb://127.0.0.1:27017/classroom", {
 	  useNewUrlParser: true,
 	})
 	.then(() => console.log("MongoDB connected..."))
@@ -72,27 +72,27 @@ const {
   
   app.use(helmet())
   
-  // Below corsOptions are for Local development
-  const corsOptions = {
-	origin: 'http://localhost:4001',
-	credentials: true,
-	optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-  }
+//   // Below corsOptions are for Local development
+//   const corsOptions = {
+// 	origin: 'http://localhost:4001',
+// 	credentials: true,
+// 	optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+//   }
   
-  // Below corsOptions work in deployment as Docker containers
-  const corsOptionsProd = {
-	origin: 'http://localhost',
-	credentials: true,
-	optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-  }
+//   // Below corsOptions work in deployment as Docker containers
+//   const corsOptionsProd = {
+// 	origin: 'http://localhost',
+// 	credentials: true,
+// 	optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+//   }
   
-app.use(cors(corsOptions));  
+// app.use(cors(corsOptions));  
   
-router.get("/", (req, res) => res.send("HELLO FRIEND"));
+app.get("/", (req, res) => res.status(200).send({message: "HELLO FRIEND"}));
   
   // API / Routes;
   // Uncomment Below for Development
-app.use("/api/users", require("./routes/users"));
+app.use("/api/users", router);
 
 
 if(process.env.NODE_ENV==='production'){
@@ -103,13 +103,13 @@ if(process.env.NODE_ENV==='production'){
 }
 app.set('port', (process.env.PORT || 4001))
 
-sanitizeString = (str) => {
+const sanitizeString = (str) => {
 	return xss(str)
 }
 
-connections = {}
-messages = {}
-timeOnline = {}
+let connections = {}
+let messages = {}
+let timeOnline = {}
 
 io.on('connection', (socket) => {
 

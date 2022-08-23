@@ -7,7 +7,8 @@ import {
   REGISTER_SUCCESS,
   REGISTER_FAIL,
   AUTH_SUCCESS,
-  AUTH_FAIL
+  AUTH_FAIL,
+  LOGOUT_FAIL
 } from "../actions/types";
 
 
@@ -26,6 +27,14 @@ export default function (state = initialState, action) {
       };
 
     case LOGIN_SUCCESS:
+      console.log(state);
+      console.log(action.payload)
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload
+      };
+    
     case AUTH_SUCCESS:
       return {
         ...state,
@@ -34,8 +43,26 @@ export default function (state = initialState, action) {
       };
 
     case AUTH_ERROR:
-    case LOGIN_FAIL:
-    case LOGOUT_SUCCESS:
+    case LOGIN_FAIL: 
+      return {
+        ...state,
+        user: null,
+        isAuthenticated: false,
+      }
+    case LOGOUT_SUCCESS: 
+      return {
+        ...state,
+        user: null,
+        isAuthenticated: false,
+      }
+
+    case LOGOUT_FAIL: 
+      return {
+        ...state,
+        user: null,
+        isAuthenticated: false,
+      }
+
     case REGISTER_FAIL:
     case AUTH_FAIL:
       return {

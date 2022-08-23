@@ -10,8 +10,7 @@ exports.isAuth = (req,res,next) => {
       next();
   }
   else {
-      err = res.status(401).json("You Need to Be Logged in to do this. Access Denied ")
-      return err;
+    return res.status(401).json("You Need to Be Logged in to do this. Access Denied ")
   }
 };
 
@@ -62,8 +61,9 @@ exports.loginUser = (req, res) => {
   if(!result.error) {
     //check for existing user
     User.findOne({ email }).then((user) => {
+      // console.log(user);
       if (!user) return res.status(400).json("Incorrect Email or Password");
-
+      // console.log(user.password)
       // Validate password
       bcrypt.compare(password, user.password).then((isMatch) => {
         if (!isMatch) return res.status(400).json("Incorrect Email or Password");

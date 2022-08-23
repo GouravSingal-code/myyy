@@ -45,15 +45,25 @@ class Login extends Component {
 }
 
 componentDidUpdate(prevProps) {
-      const status = this.props.status;
+  const status = this.props.status;
 
-     if (status !== prevProps.status) {
-
-      if (status.id === "LOGIN_FAIL") {
-        this.setState({ msg: status.statusMsg });
-      }
+  // Changes status message if it is different from previous message
+  if (status !== prevProps.status) {
+    if (status.id === "LOGIN_FAIL") {
+      this.setState({ msg: status.statusMsg });
+    } else {
+      this.setState({ msg: this.props.status.statusMsg });
     }
-};
+  }
+
+  // Redirects to Log In screen after a delay of 2secs if successfully registered
+  if (status.id === "LOGIN_SUCCESS") {
+    setTimeout(() => {
+      this.props.history.push("/video");
+    }, 2000);
+  }
+}
+
 
 
 onChange = (e) => {

@@ -21,8 +21,8 @@ import {
 //Check if user is already logged in
 export const isAuth = () => (dispatch) => {
 
-    axios
-    .get("https://localhost:4001/api/users/authchecker",{withCredentials:true})
+  axios
+    .get("http://localhost:4001/api/users/authchecker", { withCredentials: true })
     .then((res) =>
       dispatch({
         type: AUTH_SUCCESS,
@@ -37,8 +37,8 @@ export const isAuth = () => (dispatch) => {
 
 }
 
-//Register New User
-export const register =({ name, email, password }) => async (dispatch) => {
+// Register New User
+export const register = ({ name, email, password }) => async (dispatch) => {
   // Headers
   const headers = {
     headers: {
@@ -47,15 +47,14 @@ export const register =({ name, email, password }) => async (dispatch) => {
   };
 
   // Request body
-  const body = {name,email,password};
-  
-  try{
-    const res = await axios.post("https://localhost:4001/api/users/register", body, headers)
+  const body = JSON.stringify({ name, email, password });
+
+  try {
+    const res = await axios.post("http://localhost:4001/api/users/register", body, headers)
     console.log(res.data);
-    console.log(res.body);
-    dispatch(returnStatus(res.data.data, res.data.status, 'REGISTER_SUCCESS'));
+    dispatch(returnStatus(res.data, res.status, 'REGISTER_SUCCESS'));
     dispatch({ type: IS_LOADING })
-  }catch(err){
+  } catch (err) {
     console.log(err);
     dispatch(returnStatus(err.response.data, err.response.status, 'REGISTER_FAIL'))
     dispatch({
@@ -64,28 +63,11 @@ export const register =({ name, email, password }) => async (dispatch) => {
     dispatch({ type: IS_LOADING })
   }
 
-  
 
-  // axios
-  // .post("https://localhost:4001/api/users/register", body, headers)
-  // .then((res) =>{
-  //   dispatch(returnStatus(res.data, res.status, 'REGISTER_SUCCESS'));
-  //   dispatch({ type: IS_LOADING })
-  // })
-  // .catch((err) => {
-  //   console.log(err);
-  //   dispatch(returnStatus(err.response.data, err.response.status, 'REGISTER_FAIL'))
-  //   dispatch({
-  //     type: REGISTER_FAIL
-  //   });
-  //   dispatch({ type: IS_LOADING })
-  // });
-
- 
 };
 
 //Login User
-export const login = ({ email, password }) => (dispatch) => {
+export const login = ({ email, password }) => async (dispatch) => {
   // Headers
   const headers = {
     headers: {
@@ -96,37 +78,46 @@ export const login = ({ email, password }) => (dispatch) => {
   // Request body
   const body = JSON.stringify({ email, password });
 
-  axios
-    .post("https://localhost:4001/api/users/login", body, headers)
-    .then((res) => {
-      console.log(res);
-      dispatch({
-        type: LOGIN_SUCCESS,
-        payload: res.data
-      });
-      dispatch({ type: IS_LOADING });
-    }
-    )
-    .catch((err) => {
-      dispatch(returnStatus(err.response.data, err.response.status, 'LOGIN_FAIL'))
-      dispatch({
-        type: LOGIN_FAIL
-      });
-      dispatch({ type: IS_LOADING })
+  try {
+
+    const res = await axios.post("http://localhost:4001/api/users/login", body, headers);
+    console.log(res);
+    dispatch(returnStatus('Login successfully', res.status, 'LOGIN_SUCCESS'));
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: res.data
     });
+    dispatch({ type: IS_LOADING })
+  } catch (err) {
+    console.log(err);
+    dispatch(returnStatus(err.response.data, err.response.status, 'LOGIN_FAIL'));
+    dispatch({
+      type: LOGIN_FAIL
+    });
+    dispatch({ type: IS_LOADING })
+  }
+
+
 };
 
 //Logout User and Destroy session
-export const logout = () => (dispatch) => {
-    axios
-    .delete("https://localhost:4001/api/users/logout", { withCredentials: true })
-    .then((res) =>
+export const logout = () => async(dispatch) => {
+    try{
+      const headers = {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      };
+
+      const res = await axios.delete("http://localhost:4001/api/users/logout", headers);
+      console.log(res);
+      dispatch(returnStatus('Logout successfully', res.status, 'LOGOUT_SUCCESS'));
       dispatch({
         type: LOGOUT_SUCCESS,
-      })
-    )
-    .catch((err) => {
-      console.log(err);
-    });
-
+      });
+      dispatch({ type: IS_LOADING })
+    }catch(err){
+      // dispatch({ type: IS_LOADING })
+      console.log(err.message);
+    }
 }

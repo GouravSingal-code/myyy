@@ -18,6 +18,7 @@ class App extends Component {
 						<Route path="/login" component={Login} />
 						<Route path="/register" component={Register} />
 						<Route exact path ="/profile" component={Profile}/>
+						<Route exact path ="/video" component={Video}/>
 					</Switch>
 				</Provider>
 			</div>
